@@ -4,7 +4,7 @@ import express from 'express';
 import path from 'node:path';
 import type { Request, Response } from 'express';
 import db from './config/connection.js';
-import routes from './routes/index.js';
+// import routes from './routes/index.js';
 import { ApolloServer } from '@apollo/server'; // Note: Import from @apollo/server-express
 import { expressMiddleware } from '@apollo/server/express4';
 import { typeDefs, resolvers } from './schemas/index.js';
@@ -23,7 +23,7 @@ const startApolloServer = async () => {
   const PORT = process.env.PORT || 3001;
   const app = express();
 
-  app.use(express.urlencoded({ extended: true }));
+  app.use(express.urlencoded({ extended: false }));
   app.use(express.json());
 
   app.use('/graphql', expressMiddleware(server as any,
