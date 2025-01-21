@@ -60,12 +60,18 @@ const typeDefs = `
         link: String
     }
 
+    input UserInput {
+        username: String!
+        email: String!
+        password: String!
+    }
+
     type Query {
         me: User
     }
 
     type Mutation {
-        addUser(username: String!, email: String!, password: String!): Auth
+        addUser(input: UserInput!): Auth
         login(email: String!, password: String!): Auth
         saveBook(input: BookInput!): User
         removeBook(bookId: String!): User

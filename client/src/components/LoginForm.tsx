@@ -10,15 +10,16 @@ import { Form, Button, Alert } from 'react-bootstrap';
 // import { loginUser } from '../utils/API';
 import { LOGIN_USER } from '../utils/mutations';
 import Auth from '../utils/auth';
-import type { User } from '../models/User';
+// import type { User } from '../models/User';
 
 // biome-ignore lint/correctness/noEmptyPattern: <explanation>
 const LoginForm = ({}: { handleModalClose: () => void }) => {
-  const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
+  // const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
+  const [userFormData, setUserFormData] = useState({ email: '', password: ''});
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
-  const [login] = useMutation(LOGIN_USER);
+  const [login, { error, data }] = useMutation(LOGIN_USER);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -46,7 +47,10 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
 
       const { data } = await login({
         variables: { ...userFormData },
-      })
+      });
+      console.log(data);
+      console.log(data.login);
+      console.log(data.login.token);
       Auth.login(data.login.token);
     } catch (err) {
       console.error(err);
@@ -54,10 +58,8 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
     }
 
     setUserFormData({
-      username: '',
       email: '',
       password: '',
-      savedBooks: [],
     });
   };
 
@@ -67,6 +69,12 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
         <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
           Something went wrong with your login credentials!
         </Alert>
+        {error && (
+              <div className="my-3 p-3 bg-danger text-white">
+                {error.message}
+              </div>
+        )}
+        { data ? (<p>Success!</p>) : (<p>Error!</p>)}
         <Form.Group className='mb-3'>
           <Form.Label htmlFor='email'>Email</Form.Label>
           <Form.Control

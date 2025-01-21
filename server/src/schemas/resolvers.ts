@@ -10,7 +10,7 @@ interface User {
     username: string;
     email: string;
     password: string;
-    bookCount: number;
+    // bookCount: number;
     savedBooks: BookDocument[];
 }
 
@@ -62,13 +62,13 @@ const resolvers = {
             const user = await User.findOne({ email });
             // If no user is found, throw an AuthenticationError
             if (!user) {
-              throw AuthenticationError;
+              throw new AuthenticationError("Could not find user with this email.");
             }
             // Check if the provided password is correct
             const correctPw = await user.isCorrectPassword(password);
             // If the password is incorrect, throw an AuthenticationError
             if (!correctPw) {
-              throw AuthenticationError;
+              throw new AuthenticationError("incorrect password");
             }
             // Sign a token with the user's information
             const token = signToken(user.username, user.email, user._id);

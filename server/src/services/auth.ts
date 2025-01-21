@@ -1,4 +1,4 @@
-// // TODO: Update the auth middleware function to work with the GraphQL API.
+// TODO: Update the auth middleware function to work with the GraphQL API.
 
 // import type { Request, Response, NextFunction } from 'express';
 // import jwt from 'jsonwebtoken';
@@ -46,6 +46,9 @@
 //     Object.defineProperty(this, 'name', { value: 'AuthenticationError' });
 //   }
 // };
+
+
+
 
 import jwt from 'jsonwebtoken';
 import { GraphQLError } from 'graphql';
