@@ -4,7 +4,7 @@ export interface BookDocument extends Document {
   bookId: string;
   title: string;
   authors: string[];
-  description: string;
+  description: string | null;
   image: string;
   link: string;
 }
@@ -18,7 +18,6 @@ const bookSchema = new Schema<BookDocument>({
   ],
   description: {
     type: String,
-    required: true,
   },
   // saved book id from GoogleBooks
   bookId: {

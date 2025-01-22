@@ -1,7 +1,3 @@
-// TODO: Use the Apollo useMutation() hook to execute the SAVE_BOOK mutation in the handleSaveBook() function instead of the saveBook() function imported from the API file.
-// Make sure you keep the logic for saving the book's ID to state in the try...catch block!
-
-import { useMutation } from '@apollo/client'
 import { useState, useEffect } from 'react';
 import type { FormEvent } from 'react';
 import {
@@ -12,32 +8,30 @@ import {
   Card,
   Row
 } from 'react-bootstrap';
-
+import { useMutation } from '@apollo/client'
 import Auth from '../utils/auth';
-import { /* saveBook */ searchGoogleBooks } from '../utils/API';
+import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
+import { SAVE_BOOK } from '../utils/mutations';
+import { GET_ME } from '../utils/queries';
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../models/GoogleAPIBook';
-import { SAVE_BOOK } from '../utils/mutations';
 
+// component to search google's book API
 const SearchBooks = () => {
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState<Book[]>([]);
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
-
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
-  // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
-  // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
+  // save `savedBookIds` list to localStorage on component unmount
   useEffect(() => {
     return () => saveBookIds(savedBookIds);
   });
 
-
-
-  // create method to search for books and set state on form submit
+  // search for books and set state on form submit
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -45,6 +39,7 @@ const SearchBooks = () => {
       return false;
     }
 
+    // attempt to execute google book API search based on user input
     try {
       const response = await searchGoogleBooks(searchInput);
 
@@ -52,13 +47,13 @@ const SearchBooks = () => {
         throw new Error('something went wrong!');
       }
 
+      // put the returned items into a constant and then map each of them
       const { items } = await response.json();
-
       const bookData = items.map((book: GoogleAPIBook) => ({
         bookId: book.id,
         authors: book.volumeInfo.authors || ['No author to display'],
         title: book.volumeInfo.title,
-        description: book.volumeInfo.description,
+        description: book.volumeInfo.description || '',
         image: book.volumeInfo.imageLinks?.thumbnail || '',
       }));
 
@@ -69,12 +64,20 @@ const SearchBooks = () => {
     }
   };
 
-  const [saveBook, { error, data }] = useMutation(SAVE_BOOK);
+  // mutation to save book to user's savedBooks
+  const [saveBook, { error, data }] = useMutation(SAVE_BOOK, {
+      refetchQueries: [
+        GET_ME,
+        'me'
+      ]
+    });
 
-  // create function to handle saving a book to our database
+  // function to handle saving a book to database
   const handleSaveBook = async (bookId: string) => {
 
-    console.error(error);
+    if (error) {
+      console.error(error);
+    }
     console.log(data);
 
     // find the book in `searchedBooks` state by the matching id
@@ -88,17 +91,11 @@ const SearchBooks = () => {
       return false;
     }
 
+    // attempt to execute SAVE_BOOK mutation
     try {
-      
       await saveBook({
         variables: {input: { ...bookToSave } },
       });
-
-      // const response = await saveBook(bookToSave, token);
-
-      // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // }
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);

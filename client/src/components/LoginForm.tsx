@@ -1,33 +1,30 @@
-// TODO: Replace the loginUser() functionality imported from the API file with the LOGIN_USER mutation functionality.
-
-
-// see SignupForm.js for comments
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
-// import { loginUser } from '../utils/API';
+import { useMutation } from '@apollo/client';
 import { LOGIN_USER } from '../utils/mutations';
 import Auth from '../utils/auth';
-// import type { User } from '../models/User';
 
-// biome-ignore lint/correctness/noEmptyPattern: <explanation>
+// form to log in an existing user
 const LoginForm = ({}: { handleModalClose: () => void }) => {
-  // const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
+  // state to track login form data
   const [userFormData, setUserFormData] = useState({ email: '', password: ''});
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
+  // requests to log in a user from graphql
   const [login, { error, data }] = useMutation(LOGIN_USER);
 
+  // reflects changes in form state
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
 
+  // function to submit the login form
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    console.log(userFormData);
 
     // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
@@ -36,27 +33,18 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
       event.stopPropagation();
     }
 
+    // try to execute the LOGIN_USER mutation
     try {
-      // const response = await loginUser(userFormData);
-
-      // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // }
-
-      // const { token } = await response.json();
-
       const { data } = await login({
         variables: { ...userFormData },
       });
-      console.log(data);
-      console.log(data.login);
-      console.log(data.login.token);
       Auth.login(data.login.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
 
+    // reset form data to empty
     setUserFormData({
       email: '',
       password: '',

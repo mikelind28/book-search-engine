@@ -1,16 +1,11 @@
-// TODO: Replace the addUser() functionality imported from the API file with the ADD_USER mutation functionality.
-
 import { useState } from 'react';
-import { useMutation } from '@apollo/client';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
-// import { createUser } from '../utils/API';
+import { useMutation } from '@apollo/client';
 import { ADD_USER } from '../utils/mutations';
 import Auth from '../utils/auth';
-// import type { User } from '../models/User';
 
-// biome-ignore lint/correctness/noEmptyPattern: <explanation>
+// form to sign up a new user
 const SignupForm = ({}: { handleModalClose: () => void }) => {
   // set initial form state
   const [userFormData, setUserFormData] = useState({ username: '', email: '', password: '' });
@@ -19,13 +14,16 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
 
+  // request to add user from graphql
   const [addUser, { error, data }] = useMutation(ADD_USER);
 
+  // reflect changes in form input
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
 
+  // function to submit the signup form
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -36,23 +34,18 @@ const SignupForm = ({}: { handleModalClose: () => void }) => {
       event.stopPropagation();
     }
 
+    // attempt to execute the ADD_USER mutation
     try {
-      // const response = await createUser(userFormData);
       const { data } = await addUser({
         variables: { input: { ...userFormData } },
       });
-
-      // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // }
-
-      // const { token } = await response.json();
       Auth.login(data.addUser.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
 
+    // reset form data to empty
     setUserFormData({
       username: '',
       email: '',

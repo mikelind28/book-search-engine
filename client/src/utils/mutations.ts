@@ -1,4 +1,3 @@
-// TODO: mutations.ts:
 // LOGIN_USER will execute the loginUser mutation set up using Apollo Server.
 // ADD_USER will execute the addUser mutation.
 // SAVE_BOOK will execute the saveBook mutation.
@@ -42,7 +41,11 @@ export const REMOVE_BOOK = gql`
     mutation removeBook($bookId: String!) {
     removeBook(bookId: $bookId) {
       _id
-      book
+      username
+      savedBooks {
+        _id
+        bookId
+      }
     }
   }
 `;

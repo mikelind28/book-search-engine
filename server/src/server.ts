@@ -1,21 +1,18 @@
-// TODO: Implement the Apollo Server and apply it to the Express server as middleware.
-
 import express from 'express';
 import path from 'node:path';
 import type { Request, Response } from 'express';
 import db from './config/connection.js';
-// import routes from './routes/index.js';
-import { ApolloServer } from '@apollo/server'; // Note: Import from @apollo/server-express
+import { ApolloServer } from '@apollo/server'; 
 import { expressMiddleware } from '@apollo/server/express4';
 import { typeDefs, resolvers } from './schemas/index.js';
 import { authenticateToken } from './services/auth.js';
-
 
 const server = new ApolloServer({
   typeDefs,
   resolvers
 });
 
+// start the apollo server wrapped around the express server
 const startApolloServer = async () => {
   await server.start();
   await db();
