@@ -27,9 +27,15 @@ interface LoginUserArgs {
     password: string;
 }
 
-interface AddBookArgs {
-    userId: string;
-    book: string;
+interface SaveBookArgs {
+    input:{
+        bookId: string
+        authors: [string]
+        title: string
+        description: string
+        image: string
+        // link: string
+    }
 }
 
 interface RemoveBookArgs {
@@ -43,9 +49,10 @@ interface Context {
 
 const resolvers = {
     Query: {
-        me: async (_parent: any, _args: any, context: any) => {
+        me: async (_parent: any, _args: any, context: Context) => {
             if (context.user) {
-                return User.findOne({ _id: context.user._id }).populate('savedBooks');
+                console.log("Oh hi!", context.user._id);
+                return await User.findById(context.user._id).populate('savedBooks');
             }
             throw new AuthenticationError('Could not authenticate user.');
         },
@@ -75,12 +82,12 @@ const resolvers = {
             // Return the token and the user
             return { token, user };
         },
-        saveBook: async (_parent: any, { userId, book }: AddBookArgs, context: Context): Promise<User | null> => {
+        saveBook: async (_parent: any, { input }: SaveBookArgs, context: Context): Promise<User | null> => {
             if (context.user) {
               return await User.findOneAndUpdate(
-                { _id: userId },
+                { _id: context.user._id },
                 {
-                  $addToSet: { savedBooks: book },
+                  $addToSet: { savedBooks: input },
                 },
                 {
                   new: true,

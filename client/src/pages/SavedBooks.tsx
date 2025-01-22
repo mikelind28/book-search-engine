@@ -2,7 +2,7 @@
 // Instead, use the useQuery() hook to execute the GET_ME query on load and save it to a variable named userData.
 // Use the useMutation() hook to execute the REMOVE_BOOK mutation in the handleDeleteBook() function instead of the deleteBook() function that's imported from the API file. (Make sure you keep the removeBookId() function in place!) 
 
-// import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Container, Card, Button, Row, Col } from 'react-bootstrap';
 import { useQuery, useMutation } from '@apollo/client';
 // import { getMe, deleteBook } from '../utils/API';
@@ -11,6 +11,7 @@ import { removeBookId } from '../utils/localStorage';
 import type { Book } from '../models/Book';
 import { GET_ME } from '../utils/queries';
 import { REMOVE_BOOK } from '../utils/mutations';
+// import { User } from '../models/User';
 
 const SavedBooks = () => {
   // const [userData, setUserData] = useState<User>({
@@ -18,35 +19,23 @@ const SavedBooks = () => {
   //   email: '',
   //   password: '',
   //   savedBooks: [],
+  //   bookCount: 0
   // });
 
   // use this to determine if `useEffect()` hook needs to run again
   // const userDataLength = Object.keys(userData).length;
 
   const { loading, data } = useQuery(GET_ME);
-  const userData = data?.me || {};
+
+
+  console.log("Data!", data);
 
   // useEffect(() => {
-  //   const getUserData = async () => {
-  //     try {
-  //       const token = Auth.loggedIn() ? Auth.getToken() : null;
-
-  //       if (!token) {
-  //         return false;
-  //       }
-
-  //       const response = await getMe(token);
-
-  //       if (!response.ok) {
-  //         throw new Error('something went wrong!');
-  //       }
-
-  //       const user = await response.json();
-  //       setUserData(user);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
+  //   if (!loading && data?.me) {
+  //     console.log('Setting data! Finally!!');
+  //     userData = data.me;
+  //   }
+  // }, [data]);
 
   //   getUserData();
   // }, [userDataLength]);
@@ -93,8 +82,8 @@ const SavedBooks = () => {
     <>
       <div className='text-light bg-dark p-5'>
         <Container>
-          {userData.username ? (
-            <h1>Viewing {userData.username}'s saved books!</h1>
+          {data.me.username ? (
+            <h1>Viewing {data.me.username}'s saved books!</h1>
           ) : (
             <h1>Viewing saved books!</h1>
           )}
@@ -102,14 +91,14 @@ const SavedBooks = () => {
       </div>
       <Container>
         <h2 className='pt-5'>
-          {userData.savedBooks.length
-            ? `Viewing ${userData.savedBooks.length} saved ${
-                userData.savedBooks.length === 1 ? 'book' : 'books'
+          {data.me.bookCount
+            ? `Viewing ${data.me.savedBooks.length} saved ${
+                data.me.savedBooks.length === 1 ? 'book' : 'books'
               }:`
             : 'You have no saved books!'}
         </h2>
         <Row>
-          {userData.savedBooks.map((book: Book) => {
+          {data.me.savedBooks.map((book: Book) => {
             return (
               <Col md='4'>
                 <Card key={book.bookId} border='dark'>

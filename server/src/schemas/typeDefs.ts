@@ -38,12 +38,13 @@ const typeDefs = `
     }
 
     type Book {
+        _id: ID
         bookId: String
         title: String
         authors: [String]
         description: String
         image: String
-        link: String
+
     }
 
     type Auth {
@@ -54,10 +55,10 @@ const typeDefs = `
     input BookInput {
         bookId: String
         authors: [String]
-        description: String
         title: String
+        description: String
         image: String
-        link: String
+
     }
 
     input UserInput {
